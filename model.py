@@ -7,6 +7,8 @@ import torch.optim as optim
 
 # BN stand for Batch Normalization
 def call_bn(bn, x):
+    """Caller for callable BarchNorm2d
+    """
     return bn(x)
 
 class CNN(nn.Module):
@@ -66,4 +68,17 @@ class CNN(nn.Module):
         h = F.leaky_relu(call_bn(self.bn8, h), 0.01)
         h = self.c9(h)
         h = F.leaky_relu(call_bn(self.bn9, h), 0.01)
-        h = F.avg_pool2d(h, kernel_size=h.data.shape[2]) # Why index 2 ?
+        # In the final average pooling, we will reduce one dimension of the h
+        h = F.avg_pool2d(h, kernel_size=h.data.shape[2])
+        # Remove the last dimension [[[x]]] -> [[x]]
+        # h.view will share the same memory with h
+        # faster than copy()
+        h = h.view(h.size(0), h.size(1))
+        # Last linear layer to generate final output
+        logit = self.l_c1(h)
+        # Not sure what is bn_c1
+        # if self.top_bn:
+        #     logit = call_bn(self.bn_c1, logit)
+        return logit
+
+        
