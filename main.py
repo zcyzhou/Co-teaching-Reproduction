@@ -117,7 +117,7 @@ if args.dataset == 'cifar100':
                                 download=True,
                                 train=True,
                                 transform=transforms.ToTensor(),
-                                noise_type=args.noise_type=,
+                                noise_type=args.noise_type,
                                 noise_rate=args.noise_rate
                                 )
     test_dataset = CIFAR100(root='./data/',
