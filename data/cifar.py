@@ -10,10 +10,10 @@ from typing import Any, Callable, Optional, Tuple
 import numpy as np
 from PIL import Image
 
-from vision import VisionDataset
-from utils import check_integrity, download_and_extract_archive
-from utils import noisify
-import utils
+from .vision import VisionDataset
+from .utils import check_integrity, download_and_extract_archive
+from .utils import noisify
+import torchvision.utils
 
 import torchvision.transforms as transforms
 
