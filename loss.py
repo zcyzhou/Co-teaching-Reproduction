@@ -5,6 +5,14 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 def loss_coteaching(y_1, y_2, t, forget_rate, ind, noise_or_not):
+    """Function for computing the loss of the model
+
+    Args:
+        y_1: logist of model1
+        y_2: logist of model2
+        t: target labels
+        ind: 
+    """
     # reduction='none' will return cross_entropy loss for each one
     loss_1 = F.cross_entropy(y_1, t, reduction='none')
     # Interesting operation to sort the loss_1

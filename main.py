@@ -185,10 +185,71 @@ def accuracy(logit, target, topk=(1,)):
     """Compute the precision at k for a specified k"""
     output = F.softmax(logit, dim=1)
     maxk = max(topk)
-    pass
+    batch_size = target.size(0)
 
-def train():
-    pass
+    # pred is the indices of top maxk values in output
+    _, pred = output.topk(maxk, 1, True, True)
+    # This step is kind of meaningless
+    # If pred is in form of [...var...], this make no sense
+    # because [...var...].t() will remain the same shape
+    # However, if pred is in form of [[...var...]], it will be
+    # transposed to [...[],[],[]...]
+    # pred = [[pred[i]] for i in range(len(pred))] this only work for nparray
+    # We can use:
+    # pred = pred.expand(1, -1).t()
+    pred = pred.t()
+    correct = pred.eq(target.view(1, -1).expand_as(pred))
+
+    res = []
+    for k in topk:
+        correct_k = correct[:k].view(-1).float().sum(0, keepdim=True)
+        # k is %, multiply 100 to get the #correct
+        res.append(correct_k.mul_(100.0/batch_size))
+    
+    return res
+
+def train(train_loader, epoch, model1, optimizer1, model2, optimizer2):
+    print("Training {}...".format(model_str))
+    pure_ratio_list = []
+    pure_ratio_list1 = []
+    pure_ratio_list2 = []
+
+    train_total = 0
+    train_correct = 0
+    train_total2 = 0
+    train_correct2 = 0
+
+    for i, (images, labels, indexes) in enumerate(train_loader):
+        ind = indexes.cpu().numpy().transpose()
+        if i > args.num_iter_per_epoch:
+            break
+        
+        # Load data into GPU
+        # Instead of using Variable(), we can just assign requires_grad=True when declair Tensor
+        images = Variable(images).cuda()
+        labels = Variable(labels).cuda()
+
+        # Logits is the unnormalised output(prediction) of the model
+        logits1 = model1(images)
+        prec1, _ = accuracy(logits1, labels, topk=(1, 5))
+        train_total += 1
+        train_correct += prec1
+
+        logits2 = model2(images)
+        prec2, _ = accuracy(logits2, labels, topk=(1, 5))
+        train_total2 += 1
+        train_correct2 += prec2
+
+        loss_1, loss_2, pure_ratio_1, pure_ratio_2 = loss_coteaching(logits1, logits2, labels, rate_schedule[epoch], ind, noise_or_not)
+        pure_ratio_list1.append(pure_ratio_1*100)
+        pure_ratio_list2.append(pure_ratio_2*100)
+
+        optimizer1.zero_grad()
+        loss_1.backward()
+        optimizer1.step()
+        optimizer2.zero_grad()
+        loss_2.backward()
+        optimizer2.step()
 
 def evaluate():
     pass
