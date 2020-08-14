@@ -11,7 +11,7 @@ def loss_coteaching(y_1, y_2, t, forget_rate, ind, noise_or_not):
         y_1: logist of model1
         y_2: logist of model2
         t: target labels
-        ind: 
+        ind: The index of each elements in the dataset
     """
     # reduction='none' will return cross_entropy loss for each one
     loss_1 = F.cross_entropy(y_1, t, reduction='none')
@@ -28,6 +28,12 @@ def loss_coteaching(y_1, y_2, t, forget_rate, ind, noise_or_not):
 
     # noise_or_not is an array of [True, False]
     # np.sum will return the number of True
+    # label_precision = (#clean_labels) / (#all seleted labels)
+    # Use num_remember to represent #all selected labels
+
+    # ind_1_sorted stores the elements' index wrt batch
+    # ind stores the index wrt the whole dataset
+
     pure_ratio_1 = np.sum(noise_or_not[ind[ind_1_sorted[:num_remember]]])/float(num_remember)
     pure_ratio_2 = np.sum(noise_or_not[ind[ind_2_sorted[:num_remember]]])/float(num_remember)
 
