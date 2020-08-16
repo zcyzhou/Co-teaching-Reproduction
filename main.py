@@ -219,6 +219,13 @@ def train(train_loader, epoch, model1, optimizer1, model2, optimizer2):
     train_total2 = 0
     train_correct2 = 0
 
+    ### Only for test ####
+    for a, b in enumerate(train_loader):
+        print(a)
+        print(len(b))
+        break
+
+
     for i, (images, labels, indexes) in enumerate(train_loader):
         ind = indexes.cpu().numpy().transpose()
         if i > args.num_iter_per_epoch:
@@ -272,7 +279,7 @@ def evaluate(test_loader, model1, model2):
     model1.eval()
     correct1 = 0
     total1 = 0
-    for image, labels, _ in test_loader:
+    for images, labels in test_loader:
         images = Variable(images).cuda()
         logits1 = model1(images)
         outputs1 = F.softmax(logits1, dim=1)
@@ -283,7 +290,7 @@ def evaluate(test_loader, model1, model2):
     model2.eval()
     correct2 = 0
     total2 = 0
-    for image, labels, _ in test_loader:
+    for image, labels in test_loader:
         images = Variable(images).cuda()
         logits2 = model2(images)
         outputs2 = F.softmax(logits2, dim=1)
@@ -311,6 +318,12 @@ def main():
                                                 num_workers=args.num_workers,
                                                 drop_last=True,
                                                 shuffle=False)
+
+    ##### Only for test ####
+    for a, b in enumerate(train_loader):
+        print(a)
+        print(len(b))
+    return
 
     # Define models
     print('building model...')
