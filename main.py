@@ -227,6 +227,11 @@ def train(train_loader, epoch, model1, optimizer1, model2, optimizer2):
 
 
     for i, (images, labels, indexes) in enumerate(train_loader):
+        #
+        #
+        # Check if there's relationship between indexes and i
+        #
+        #
         ind = indexes.cpu().numpy().transpose()
         if i > args.num_iter_per_epoch:
             break
