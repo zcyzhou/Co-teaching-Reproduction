@@ -15,12 +15,31 @@ def loss_coteaching(y_1, y_2, t, forget_rate, ind, noise_or_not):
     """
     # reduction='none' will return cross_entropy loss for each one
     loss_1 = F.cross_entropy(y_1, t, reduction='none')
+
+    ############# TEST ##############
+    # print(type(loss_1))
+    # print(loss_1.is_cuda)
+    # print(loss_1.data)
+    #################################
+
     # Interesting operation to sort the loss_1
-    ind_1_sorted = np.argsort(loss_1.data).cuda()
+    ind_1_sorted = np.argsort(loss_1.data.cpu())
     loss_1_sorted = loss_1[ind_1_sorted]
 
+    #################################
+    # print("Type of loss_1_sorted:" + str(type(loss_1_sorted)))
+    # print(loss_1_sorted.is_cuda)
+    #################################
+    # print(noise_or_not)
+    # print("Type of noise_or_not:" + str(type(noise_or_not)))
+    # print(ind)
+    # print("Type of ind: " + str(type(ind)))
+    # print(ind_1_sorted)
+    # print("Type of ind_1_sorted: " + str(type(ind_1_sorted)))
+    #################################
+
     loss_2 = F.cross_entropy(y_2, t, reduction='none')
-    ind_2_sorted = np.argsort(loss_2.data).cuda()
+    ind_2_sorted = np.argsort(loss_2.data.cpu())
     loss_2_sorted = loss_2[ind_2_sorted]
 
     remember_rate = 1 - forget_rate
