@@ -233,6 +233,11 @@ def train(train_loader, epoch, model1, optimizer1, model2, optimizer2):
         #
         #
         ind = indexes.cpu().numpy().transpose()
+
+        ####### TEST ##########
+        # print(indexes)
+        #######################
+
         if i > args.num_iter_per_epoch:
             break
         
@@ -264,19 +269,26 @@ def train(train_loader, epoch, model1, optimizer1, model2, optimizer2):
         loss_2.backward()
         optimizer2.step()
 
+        ######### TEST ############
+        # print(type(loss_1.data.item()))
+        # print(loss_2.data.item())
+
+        # print(prec1.data.item())
+        ###########################
+
         if (i+1) % args.print_freq == 0:
             print('Epoch [{:d}/{:d}], Iter [{:d}/{:d}], Training Accuracy1: {:.4f}, Training Accuracy2: {:.4f}, Loss1: {:.4f}, Loss2: {:.4f}, Pure Ratio1: {:.4f}, Pure Ratio2: {:.4f}'.format(epoch+1,
                                                                                                                  args.n_epoch, i+1, len(train_dataset)//batch_size, 
-                                                                                                                 prec1, prec2,
-                                                                                                                 loss_1.data[0],
-                                                                                                                 loss_2.data[0],
+                                                                                                                 prec1.data.item(), prec2.data.item(),
+                                                                                                                 loss_1.data.item(),
+                                                                                                                 loss_2.data.item(),
                                                                                                                  np.sum(pure_ratio_list1)/len(pure_ratio_list1),
                                                                                                                  np.sum(pure_ratio_list2)/len(pure_ratio_list2)))
         
-        train_acc1 = float(train_correct)/float(train_total)
-        train_acc2 = float(train_correct2)/float(train_total2)
+    train_acc1 = float(train_correct)/float(train_total)
+    train_acc2 = float(train_correct2)/float(train_total2)
 
-        return train_acc1, train_acc2, pure_ratio_list1, pure_ratio_list2
+    return train_acc1, train_acc2, pure_ratio_list1, pure_ratio_list2
 
 
 def evaluate(test_loader, model1, model2):
@@ -353,7 +365,7 @@ def main():
     train_acc2=0
     # evaluate models with random weights
     test_acc1, test_acc2=evaluate(test_loader, cnn1, cnn2)
-    print('Epoch [{:d}/{:d}] Test Accuracy on the {} test images: Model1 {:.4f} %% Model2 {:.4f} %% Pure Ratio1 {:.4f} %% Pure Ratio2 {:.4f} %%'.format(epoch+1, args.n_epoch, len(test_dataset), test_acc1, test_acc2, mean_pure_ratio1, mean_pure_ratio2))
+    print('Epoch [{:d}/{:d}] Test Accuracy on the {} test images: Model1 {:.4f}% Model2 {:.4f}% Pure Ratio1 {:.4f}% Pure Ratio2 {:.4f}%'.format(epoch+1, args.n_epoch, len(test_dataset), test_acc1, test_acc2, mean_pure_ratio1, mean_pure_ratio2))
     # save results
     with open(txtfile, "a") as myfile:
         myfile.write(str(int(epoch)) + ': '  + str(train_acc1) +' '  + str(train_acc2) +' '  + str(test_acc1) + " " + str(test_acc2) + ' '  + str(mean_pure_ratio1) + ' '  + str(mean_pure_ratio2) + "\n")
@@ -371,7 +383,7 @@ def main():
         # save results
         mean_pure_ratio1 = sum(pure_ratio_1_list)/len(pure_ratio_1_list)
         mean_pure_ratio2 = sum(pure_ratio_2_list)/len(pure_ratio_2_list)
-        print('Epoch [{:d}/{:d}] Test Accuracy on the {} test images: Model1 {:.4f} %% Model2 {:.4f} %%, Pure Ratio 1 {:.4f} %%, Pure Ratio 2 {:.4f} %%'.format(epoch+1, args.n_epoch, len(test_dataset), test_acc1, test_acc2, mean_pure_ratio1, mean_pure_ratio2))
+        print('Epoch [{:d}/{:d}] Test Accuracy on the {} test images: Model1 {:.4f}% Model2 {:.4f}%, Pure Ratio 1 {:.4f}%, Pure Ratio 2 {:.4f}%'.format(epoch+1, args.n_epoch, len(test_dataset), test_acc1, test_acc2, mean_pure_ratio1, mean_pure_ratio2))
         with open(txtfile, "a") as myfile:
             myfile.write(str(int(epoch)) + ': '  + str(train_acc1) +' '  + str(train_acc2) +' '  + str(test_acc1) + " " + str(test_acc2) + ' ' + str(mean_pure_ratio1) + ' ' + str(mean_pure_ratio2) + "\n")
     pass
