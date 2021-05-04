@@ -128,10 +128,7 @@ if args.dataset == 'cifar100':
                                 noise_rate=args.noise_rate
                                 )
 
-"""
-@ Question:
-Need to figure out what is the function of forget_rate
-"""
+
 if args.forget_rate is None:
     forget_rate = args.noise_rate
 else:
@@ -161,9 +158,6 @@ def adjust_learning_rate(optimizer, epoch):
 rate_schedule = np.ones(args.n_epoch) * forget_rate
 rate_schedule[:args.num_gradual] = np.linspace(0, forget_rate**args.exponent, args.num_gradual)
 
-"""
-From the commment block above to here, do not really understand the code
-"""
 
 """
 Following part is for storing the result
