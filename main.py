@@ -68,7 +68,6 @@ There are several default values:
 
 # mnist
 if args.dataset == 'mnist':
-    # What is input_channel ????
     input_channel = 1
     num_classes = 10
     train_dataset = MNIST(root = './data/', \
